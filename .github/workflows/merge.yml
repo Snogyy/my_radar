@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: check_program_compilation
-        run: make
+        run: make re
         timeout-minutes: 2
       - run: make clean
       - run: |
