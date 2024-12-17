@@ -55,3 +55,4 @@ jobs:
 
   run_tests:
     needs: [check_program_compilation]
+    steps:
