@@ -53,6 +53,5 @@ jobs:
             done
           IFS=$OIFS
 
-  run_tests:
-    needs: [check_program_compilation]
-    steps:
+  # run_tests:
+  #   needs: [check_program_compilation]
