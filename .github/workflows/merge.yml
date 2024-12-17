@@ -40,8 +40,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - id: checkout_program_compilation
-      - run: make re
+      - id: check_program_compilation
+        run: make
         timeout-minutes: 2
       - run: make clean
       - run: |
