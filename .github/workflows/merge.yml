@@ -57,3 +57,29 @@ jobs:
 
   # run_tests:
   #   needs: [check_program_compilation]
+
+  merge-test:
+    name: Merge into main
+    runs-on: ubuntu-latest
+    needs:
+      - check_program_compilation
+      - check_coding_style
+    steps:
+       - name: Checkout repository
+        uses: action/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Test Merge
+        run: |
+          target_branch="origin/jules-branch"
+          git checkout main || git checkout -b main origin/main
+          git merge "$target_branch" --no-ff
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
