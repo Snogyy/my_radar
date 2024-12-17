@@ -1,0 +1,57 @@
+name: merge
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - jules-branches
+
+permissions:
+  checks: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  check_coding_style:
+    needs: [check_program_compilation]
+    name: check coding-style
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epitech/coding-style-checker:latest
+
+    steps:
+      -name: get coding-style errors
+        id: check_coding_style
+        run: |
+          check.sh $(pwd) $(pwd)
+          while read ERROR; do
+            filename=$(echo $ERROR | cut -d ':' -f 1 | cut -d '/' -f 2)
+            line=$(echo $ERROR | cut -d ':' -f 2)
+            gravity=$(echo $ERROR | awk -F ':' '{print $3}')
+            error=$(echo $ERROR | awk -F ':' '{print $4}')
+            echo "::error file=$filename, line=$line, title=$gravity coding style error::$error"
+          done < coding-style-reports.log
+
+  check_program_compilation:
+    name: "Check compilation"
+    runs-on: ubuntu-latest
+
+    steps:
+      -uses: actions/checkout@v3
+      -id: checkout_program_compilation
+        run: make
+        timeout-minutes: 2
+      -run: make clean
+      -run: |
+        OIFS=$IFS
+        IFS=','
+        for x in $EXECUTABLES
+          do
+            ./$x $ARGUMENTS
+          done
+        IFS=$OIFS
+
+  run_tests:
+    needs: [check_program_compilation]
