@@ -45,13 +45,13 @@ jobs:
         timeout-minutes: 2
       - run: make clean
       - run: |
-        OIFS=$IFS
-        IFS=','
-        for x in $EXECUTABLES
-          do
-            ./$x $ARGUMENTS
-          done
-        IFS=$OIFS
+          OIFS=$IFS
+          IFS=','
+          for x in $EXECUTABLES
+            do
+              ./$x $ARGUMENTS
+            done
+          IFS=$OIFS
 
   run_tests:
     needs: [check_program_compilation]
