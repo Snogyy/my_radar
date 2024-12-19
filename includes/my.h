@@ -47,6 +47,7 @@ typedef struct sprite {
     int nb_tower;
     sfTexture *tower_text;
     tower_t *tower;
+    int show_hitbox;
 } sprite_t;
 
 void init_planes(sprite_t *sprite, char *path);
