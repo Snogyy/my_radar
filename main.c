@@ -13,6 +13,7 @@ void init_sprites(sprite_t *sprite, char *path)
     sprite->background_text = sfTexture_createFromFile
     ("src/world.jpg", sfFalse);
     sfSprite_setTexture(sprite->background, sprite->background_text, sfFalse);
+    sprite->show_hitbox = 1;
     init_planes(sprite, path);
     init_towers(sprite, path);
 }
@@ -22,16 +23,20 @@ void draw_sprites(sprite_t *sprite, sfRenderWindow *window)
     sfRenderWindow_clear(window, sfBlack);
     sfRenderWindow_drawSprite(window, sprite->background, sfFalse);
     for (int i = 0; i < sprite->nb_plane; i++) {
-        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0) {
+        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0)
             sfRenderWindow_drawSprite(window, sprite->plane[i].plane, sfFalse);
+        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0
+        && sprite->show_hitbox == 1) {
             sfRenderWindow_drawRectangleShape(window,
             sprite->plane[i].hitbox, sfFalse);
         }
     }
     for (int i = 0; i < sprite->nb_tower; i++) {
         sfRenderWindow_drawSprite(window, sprite->tower[i].tower, sfFalse);
-        sfRenderWindow_drawCircleShape(window, sprite->tower[i].hitbox,
-        sfFalse);
+        if (sprite->show_hitbox == 1) {
+            sfRenderWindow_drawCircleShape(window, sprite->tower[i].hitbox,
+            sfFalse);
+        }
     }
     sfRenderWindow_display(window);
 }
@@ -55,10 +60,16 @@ void destroy_all(sprite_t *sprite, sfRenderWindow *window,
     sfRenderWindow_destroy(window);
 }
 
-void manage_events(sfRenderWindow *window, sfEvent event)
+void manage_events(sfRenderWindow *window, sfEvent event, sprite_t *sprite)
 {
     if (event.type == sfEvtClosed)
         sfRenderWindow_close(window);
+    if (event.type == sfEvtKeyPressed && event.key.code == sfKeyL) {
+        if (sprite->show_hitbox == 0)
+            sprite->show_hitbox = 1;
+        else
+            sprite->show_hitbox = 0;
+    }
 }
 
 int main(int ac, char **av)
@@ -76,7 +87,7 @@ int main(int ac, char **av)
         return EXIT_FAILURE;
     while (sfRenderWindow_isOpen(window)) {
         while (sfRenderWindow_pollEvent(window, &event))
-            manage_events(window, event);
+            manage_events(window, event, &sprite);
         verify_collide(&sprite);
         move_plane(&sprite, clock_move, clock_delay);
         draw_sprites(&sprite, window);
