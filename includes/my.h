@@ -14,18 +14,17 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846
-#endif
-
 #ifndef INCLUDED_MY_H
     #define INCLUDED_MY_H
+    #define M_PI 3.14159265358979323846
 
 typedef struct plane {
     sfSprite *plane;
     sfRectangleShape *hitbox;
     int is_dep;
     int is_arr;
+    int in_tower;
+    int id_tower;
     sfVector2f dep_pos;
     sfVector2f arr_pos;
     int speed;
@@ -52,11 +51,8 @@ typedef struct sprite {
 
 void init_planes(sprite_t *sprite, char *path);
 void init_towers(sprite_t *sprite, char *path);
+void get_info(sprite_t *sprite, char *path, int is_plane);
 int get_nbelemt(char *path, int is_plane);
-void get_info_plane(sprite_t *sprite, char *path);
-void get_info_tower(sprite_t *sprite, char *path);
-char **my_str_to_word_array(char const *str);
-int str_to_int(char *str);
 int my_strlen(char const *str);
 void move_plane(sprite_t *sprite, sfClock *clock_move, sfClock *clock_delay);
 void verify_collide(sprite_t *sprite);
