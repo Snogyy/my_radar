@@ -33,11 +33,15 @@ int verify_error(char *path)
     char *line = NULL;
     size_t len = 0;
 
-    if (fd == NULL)
+    if (fd == NULL) {
+        write(1, "The script is not found\n", 24);
         return 84;
+    }
     while (getline(&line, &len, fd) != -1) {
-        if (verify_line(line) == 84)
+        if (verify_line(line) == 84) {
+            write(1, "The script is incorrect\n", 24);
             return 84;
+        }
     }
     return 0;
 }
