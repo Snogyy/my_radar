@@ -10,7 +10,12 @@ SRC 	=	main.c \
 			tower.c \
 			get_info.c \
 			collide.c \
-			includes/my_strlen.c
+			error.c \
+			events.c \
+			includes/my_strlen.c \
+			includes/int_to_str.c \
+			includes/my_revstr.c \
+			includes/my_countnb.c \
 
 OBJ		=	$(SRC:.c=.o)
 

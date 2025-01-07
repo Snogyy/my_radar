@@ -14,6 +14,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <string.h>
+
 #ifndef INCLUDED_MY_H
     #define INCLUDED_MY_H
     #define M_PI 3.14159265358979323846
@@ -38,6 +40,11 @@ typedef struct tower {
     int radius;
 } tower_t;
 
+typedef struct explosion {
+    int is_active;
+    void *next;
+} explosion_t;
+
 typedef struct sprite {
     sfTexture *background_text;
     sfSprite *background;
@@ -48,6 +55,7 @@ typedef struct sprite {
     sfTexture *tower_text;
     tower_t *tower;
     int show_hitbox;
+    sfText *timer;
 } sprite_t;
 
 void init_planes(sprite_t *sprite, char *path);
@@ -57,5 +65,10 @@ int get_nbelemt(char *path, int is_plane);
 int my_strlen(char const *str);
 void move_plane(sprite_t *sprite, sfClock *clock_move, sfClock *clock_delay);
 void verify_collide(sprite_t *sprite);
+int verify_error(char *path);
+void manage_events(sfRenderWindow *window, sprite_t *sprite);
+char *int_to_str(int i);
+char *my_revstr(char *str);
+int my_countnb(long number);
 
 #endif

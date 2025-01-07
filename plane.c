@@ -28,6 +28,7 @@ void init_planes(sprite_t *sprite, char *path)
     get_info(sprite, path, 1);
     sprite->plane_text = sfTexture_createFromFile("src/plane.png", sfFalse);
     for (int i = 0; i < sprite->nb_plane; i++) {
+        sprite->plane[i].id_tower = -1;
         sprite->plane[i].is_dep = 0;
         sprite->plane[i].is_arr = 0;
         sprite->plane[i].plane = sfSprite_create();
@@ -80,9 +81,11 @@ void move_plane(sprite_t *sprite,
     sfClock *clock_move, sfClock *clock_delay)
 {
     float time = sfTime_asSeconds(sfClock_getElapsedTime(clock_move));
+    int timer = sfTime_asSeconds(sfClock_getElapsedTime(clock_delay));
     sfVector2f act_pos;
     sfVector2f next_pos;
 
+    sfText_setString(sprite->timer, int_to_str(timer));
     for (int i = 0; i < sprite->nb_plane; i++) {
         act_pos = sfSprite_getPosition(sprite->plane[i].plane);
         verify_flying(clock_delay, &sprite->plane[i], act_pos);
