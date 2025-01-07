@@ -21,17 +21,16 @@ void init_sprites(sprite_t *sprite, char *path)
     sfText_setPosition(sprite->timer, (sfVector2f){1750, 10});
     sfText_setLetterSpacing(sprite->timer, 3);
     sprite->show_hitbox = 1;
+    sprite->show_sprite = 1;
     init_planes(sprite, path);
     init_towers(sprite, path);
 }
 
-void draw_sprites(sprite_t *sprite, sfRenderWindow *window)
+void draw_plane(sprite_t *sprite, sfRenderWindow *window)
 {
-    sfRenderWindow_clear(window, sfBlack);
-    sfRenderWindow_drawSprite(window, sprite->background, sfFalse);
-    sfRenderWindow_drawText(window, sprite->timer, sfFalse);
     for (int i = 0; i < sprite->nb_plane; i++) {
-        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0)
+        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0
+        && sprite->show_sprite == 1)
             sfRenderWindow_drawSprite(window, sprite->plane[i].plane, sfFalse);
         if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0
         && sprite->show_hitbox == 1) {
@@ -39,13 +38,27 @@ void draw_sprites(sprite_t *sprite, sfRenderWindow *window)
             sprite->plane[i].hitbox, sfFalse);
         }
     }
+}
+
+void draw_tower(sprite_t *sprite, sfRenderWindow *window)
+{
     for (int i = 0; i < sprite->nb_tower; i++) {
-        sfRenderWindow_drawSprite(window, sprite->tower[i].tower, sfFalse);
+        if (sprite->show_sprite == 1)
+            sfRenderWindow_drawSprite(window, sprite->tower[i].tower, sfFalse);
         if (sprite->show_hitbox == 1) {
             sfRenderWindow_drawCircleShape(window, sprite->tower[i].hitbox,
             sfFalse);
         }
     }
+}
+
+void draw_sprites(sprite_t *sprite, sfRenderWindow *window)
+{
+    sfRenderWindow_clear(window, sfBlack);
+    sfRenderWindow_drawSprite(window, sprite->background, sfFalse);
+    sfRenderWindow_drawText(window, sprite->timer, sfFalse);
+    draw_plane(sprite, window);
+    draw_tower(sprite, window);
     sfRenderWindow_display(window);
 }
 

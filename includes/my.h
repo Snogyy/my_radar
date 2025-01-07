@@ -55,6 +55,7 @@ typedef struct sprite {
     sfTexture *tower_text;
     tower_t *tower;
     int show_hitbox;
+    int show_sprite;
     sfText *timer;
 } sprite_t;
 
