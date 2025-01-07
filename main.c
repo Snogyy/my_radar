@@ -7,66 +7,39 @@
 
 #include "includes/my.h"
 
-void init_sprites(sprite_t *sprite, char *path)
+int show_usage(void)
 {
-    sfFont *font = sfFont_createFromFile("src/digital-7.regular.ttf");
-
-    sprite->background = sfSprite_create();
-    sprite->background_text = sfTexture_createFromFile
-    ("src/world.jpg", sfFalse);
-    sprite->timer = sfText_create();
-    sfText_setFont(sprite->timer, font);
-    sfText_setCharacterSize(sprite->timer, 60);
-    sfSprite_setTexture(sprite->background, sprite->background_text, sfFalse);
-    sfText_setPosition(sprite->timer, (sfVector2f){1750, 10});
-    sfText_setLetterSpacing(sprite->timer, 3);
-    sprite->show_hitbox = 1;
-    init_planes(sprite, path);
-    init_towers(sprite, path);
+    write(1, "Air traffic simulation panel\nUSAGE\n", 35);
+    write(1, "\t./my_radar [OPTIONS] path_to_script\n", 37);
+    write(1, "\tpath_to_script\tThe path to the script file.\nOPTIONS\n", 54);
+    write(1, "\t-h\tprint the usage and quit.\nUSER INTERACTIONS\n", 49);
+    write(1, "\t'L' key\tenable/disable hitboxes and areas.\n", 45);
+    write(1, "\t'S' key\tenable/disable sprites.\n", 34);
+    return 0;
 }
 
-void draw_sprites(sprite_t *sprite, sfRenderWindow *window)
+int program_end(sprite_t *sprite)
 {
-    sfRenderWindow_clear(window, sfBlack);
-    sfRenderWindow_drawSprite(window, sprite->background, sfFalse);
-    sfRenderWindow_drawText(window, sprite->timer, sfFalse);
+    int all_landed = 1;
+
     for (int i = 0; i < sprite->nb_plane; i++) {
-        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0)
-            sfRenderWindow_drawSprite(window, sprite->plane[i].plane, sfFalse);
-        if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0
-        && sprite->show_hitbox == 1) {
-            sfRenderWindow_drawRectangleShape(window,
-            sprite->plane[i].hitbox, sfFalse);
-        }
+        if (sprite->plane[i].is_arr == 0)
+            all_landed = 0;
     }
-    for (int i = 0; i < sprite->nb_tower; i++) {
-        sfRenderWindow_drawSprite(window, sprite->tower[i].tower, sfFalse);
-        if (sprite->show_hitbox == 1) {
-            sfRenderWindow_drawCircleShape(window, sprite->tower[i].hitbox,
-            sfFalse);
-        }
-    }
-    sfRenderWindow_display(window);
+    return all_landed;
 }
 
-void destroy_all(sprite_t *sprite, sfRenderWindow *window,
+void loop_func(sprite_t *sprite, sfRenderWindow *window,
     sfClock *clock_move, sfClock *clock_delay)
 {
-    sfSprite_destroy(sprite->background);
-    sfTexture_destroy(sprite->background_text);
-    sfTexture_destroy(sprite->plane_text);
-    sfText_destroy(sprite->timer);
-    for (int i = 0; i < sprite->nb_plane; i++) {
-        sfSprite_destroy(sprite->plane[i].plane);
-        sfRectangleShape_destroy(sprite->plane[i].hitbox);
+    while (sfRenderWindow_isOpen(window)) {
+        manage_events(window, sprite);
+        verify_collide(sprite);
+        move_plane(sprite, clock_move, clock_delay);
+        draw_sprites(sprite, window);
+        if (program_end(sprite) == 1)
+            break;
     }
-    for (int i = 0; i < sprite->nb_tower; i++) {
-        sfSprite_destroy(sprite->tower[i].tower);
-        sfCircleShape_destroy(sprite->tower[i].hitbox);
-    }
-    sfClock_destroy(clock_move);
-    sfClock_destroy(clock_delay);
-    sfRenderWindow_destroy(window);
 }
 
 int main(int ac, char **av)
@@ -78,17 +51,14 @@ int main(int ac, char **av)
     sfClock *clock_move = sfClock_create();
     sfClock *clock_delay = sfClock_create();
 
+    if (av[1][0] == '-' && av[1][1] == 'h')
+        return show_usage();
     if (verify_error(av[1]) == 84 || ac > 2)
         return 84;
     init_sprites(&sprite, av[1]);
     if (!window)
         return 84;
-    while (sfRenderWindow_isOpen(window)) {
-        manage_events(window, &sprite);
-        verify_collide(&sprite);
-        move_plane(&sprite, clock_move, clock_delay);
-        draw_sprites(&sprite, window);
-    }
+    loop_func(&sprite, window, clock_move, clock_delay);
     destroy_all(&sprite, window, clock_move, clock_delay);
     return 0;
 }

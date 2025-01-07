@@ -67,6 +67,10 @@ void move_plane(sprite_t *sprite, sfClock *clock_move, sfClock *clock_delay);
 void verify_collide(sprite_t *sprite);
 int verify_error(char *path);
 void manage_events(sfRenderWindow *window, sprite_t *sprite);
+void init_sprites(sprite_t *sprite, char *path);
+void draw_sprites(sprite_t *sprite, sfRenderWindow *window);
+void destroy_all(sprite_t *sprite, sfRenderWindow *window,
+    sfClock *clock_move, sfClock *clock_delay);
 char *int_to_str(int i);
 char *my_revstr(char *str);
 int my_countnb(long number);
