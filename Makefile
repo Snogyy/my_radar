@@ -20,7 +20,7 @@ SRC 	=	main.c \
 
 OBJ		=	$(SRC:.c=.o)
 
-NAME 	= 	myradar
+NAME 	= 	my_radar
 
 CFLAGS	+=	-g -lm -lcsfml-window -lcsfml-graphics -lcsfml-system -lcsfml-audio
 
