@@ -7,8 +7,8 @@
 
 #include "includes/my.h"
 
-int check_circle_rect_collision(sfRectangleShape *rect, sfCircleShape *circ,
-    int radius)
+static int check_circle_rect_collision(sfRectangleShape *rect,
+    sfCircleShape *circ, int radius)
 {
     sfVector2f rect_pos = sfRectangleShape_getPosition(rect);
     sfVector2f rect_size = sfRectangleShape_getSize(rect);
@@ -27,7 +27,7 @@ int check_circle_rect_collision(sfRectangleShape *rect, sfCircleShape *circ,
         return 0;
 }
 
-void is_in_tower(plane_t *plane, tower_t *tower, int id_tower)
+static void is_in_tower(plane_t *plane, tower_t *tower, int id_tower)
 {
     sfRectangleShape *rect = plane->hitbox;
     sfCircleShape *circ = tower->hitbox;
@@ -44,35 +44,64 @@ void is_in_tower(plane_t *plane, tower_t *tower, int id_tower)
     }
 }
 
-void is_intersecting_plane(sprite_t *sprite, int i, int j)
+void verify_tower_collide(sprite_t *sprite, int i)
 {
-    sfRectangleShape *rect1 = sprite->plane[i].hitbox;
-    sfRectangleShape *rect2 = sprite->plane[j].hitbox;
+    if (sprite->plane[i].is_dep == 1 && sprite->plane[i].is_arr == 0) {
+        for (int j = 0; j < sprite->nb_tower; j++)
+            is_in_tower(&sprite->plane[i], &sprite->tower[j], j);
+    }
+}
+
+void is_intersecting_plane(sprite_t *sprite, plane_t *plane1, plane_t *plane2)
+{
+    sfRectangleShape *rect1 = plane1->hitbox;
+    sfRectangleShape *rect2 = plane2->hitbox;
     sfVector2f pos1 = sfRectangleShape_getPosition(rect1);
     sfVector2f pos2 = sfRectangleShape_getPosition(rect2);
     sfVector2f size1 = sfRectangleShape_getSize(rect1);
     sfVector2f size2 = sfRectangleShape_getSize(rect2);
 
-    if (sprite->plane[i].in_tower == 0 && sprite->plane[j].in_tower == 0
-    && sprite->plane[i].is_arr == 0 && sprite->plane[j].is_arr == 0) {
+    if (plane1->in_tower == 0 && plane2->in_tower == 0
+    && plane1->is_arr == 0 && plane2->is_arr == 0) {
         if ((pos2.x >= pos1.x + size1.x) || (pos2.x + size2.x <= pos1.x)
         || (pos2.y >= pos1.y + size1.y) || (pos2.y + size2.y <= pos1.y))
             return;
         else {
-            sprite->plane[i].is_arr = 1;
-            sprite->plane[j].is_arr = 1;
+            plane1->is_arr = 1;
+            plane2->is_arr = 1;
         }
+    }
+}
+
+void verify_plane_collide(sprite_t *sprite, plane_t *plane1)
+{
+    plane_t *plane2 = plane1->next_plane;
+
+    while (plane2 != NULL) {
+        if (plane2->is_dep == 1 && plane2->is_arr == 0)
+            is_intersecting_plane(sprite, plane1, plane2);
+        plane2 = plane2->next_plane;
+    }
+}
+
+void verify_area_collide(sprite_t *sprite, int i)
+{
+    plane_t *plane1 = sprite->areas[i].planes;
+
+    while (plane1 != NULL && plane1->next_plane != NULL) {
+        if (plane1->is_dep == 1 && plane1->is_arr == 0)
+            verify_plane_collide(sprite, plane1);
+        plane1 = plane1->next_plane;
     }
 }
 
 void verify_collide(sprite_t *sprite)
 {
-    for (int i = 0; i < sprite->nb_plane; i++) {
-        for (int j = 0; j < sprite->nb_tower; j++)
-            is_in_tower(&sprite->plane[i], &sprite->tower[j], j);
-    }
-    for (int i = 0; i < (sprite->nb_plane - 1); i++) {
-        for (int j = (i + 1); j < (sprite->nb_plane); j++)
-            is_intersecting_plane(sprite, i, j);
-    }
+    plane_t *temp1;
+    plane_t *temp2;
+
+    for (int i = 0; i < sprite->nb_plane; i++)
+        verify_tower_collide(sprite, i);
+    for (int i = 0; i < sprite->nb_area; i++)
+        verify_area_collide(sprite, i);
 }

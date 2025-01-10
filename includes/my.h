@@ -13,7 +13,6 @@
 #include <math.h>
 #include <fcntl.h>
 #include <unistd.h>
-
 #include <string.h>
 
 #ifndef INCLUDED_MY_H
@@ -31,6 +30,7 @@ typedef struct plane {
     sfVector2f arr_pos;
     int speed;
     int delay;
+    struct plane *next_plane;
 } plane_t;
 
 typedef struct tower {
@@ -40,20 +40,22 @@ typedef struct tower {
     int radius;
 } tower_t;
 
-typedef struct explosion {
-    int is_active;
-    void *next;
-} explosion_t;
+typedef struct area {
+    sfIntRect area_rect;
+    plane_t *planes;
+} area_t;
 
 typedef struct sprite {
     sfTexture *background_text;
     sfSprite *background;
-    int nb_plane;
     sfTexture *plane_text;
     plane_t *plane;
-    int nb_tower;
+    int nb_plane;
     sfTexture *tower_text;
     tower_t *tower;
+    int nb_tower;
+    area_t *areas;
+    int nb_area;
     int show_hitbox;
     int show_sprite;
     sfText *timer;
@@ -72,6 +74,8 @@ void init_sprites(sprite_t *sprite, char *path);
 void draw_sprites(sprite_t *sprite, sfRenderWindow *window);
 void destroy_all(sprite_t *sprite, sfRenderWindow *window,
     sfClock *clock_move, sfClock *clock_delay);
+void init_areas(sprite_t *sprite, char *path);
+void verify_area_plane(sprite_t *sprite);
 char *int_to_str(int i);
 char *my_revstr(char *str);
 int my_countnb(long number);

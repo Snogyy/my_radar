@@ -97,5 +97,6 @@ void move_plane(sprite_t *sprite,
             (sfVector2f){next_pos.x - 10, next_pos.y - 10});
         }
     }
+    verify_area_plane(sprite);
     sfClock_restart(clock_move);
 }

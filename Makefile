@@ -13,6 +13,7 @@ SRC 	=	main.c \
 			error.c \
 			events.c \
 			sprites.c \
+			areas.c \
 			includes/my_strlen.c \
 			includes/int_to_str.c \
 			includes/my_revstr.c \

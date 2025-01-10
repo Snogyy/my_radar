@@ -24,6 +24,7 @@ void init_sprites(sprite_t *sprite, char *path)
     sprite->show_sprite = 1;
     init_planes(sprite, path);
     init_towers(sprite, path);
+    init_areas(sprite, path);
 }
 
 void draw_plane(sprite_t *sprite, sfRenderWindow *window)
