@@ -11,7 +11,7 @@ Welcome to **my_radar**, a **2D air traffic simulator** built using **CSFML**. T
 ## 🚀 Features
    • Realistic simulation of airplane trajectories.  
    • Collision detection between aircraft.  
-   • Control towers preventing collisions between airplanes.
+   • Control towers preventing collisions between airplanes.   
    • Smooth animations and performance-optimized.
 
 ## 🛠️ Installation & Compilation
@@ -27,7 +27,7 @@ sudo apt-get install build-essential libcsfml-dev
 git clone https://github.com/Snogyy/my_radar.git
 cd my_radar
 make
-./my_radar file_info
+./my_radar generator/randomly_generated_file
 ```
 
 ## 🔗 Links
